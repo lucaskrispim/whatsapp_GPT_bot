@@ -1,20 +1,20 @@
 {
-  "name": "teste_robo",
+  "name": "bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest ./src/tests",
-    "start": "node ./src/index.js",
-    "authenticate": "node ./src/conect_save.js"
+    "start": "node ./src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.5",
+    "dotenv": "^16.4.5",
     "fs": "0.0.1-security",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.14.1"
+    "whatsapp-web.js": "^1.25.0"
   },
   "devDependencies": {
     "jest": "^27.1.1"

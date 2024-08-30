@@ -1,22 +1,52 @@
-const { Client } = require('whatsapp-web.js')
-const path = require("path");
-const Version = require('./versiculo.js')
-const SESSION_FILE_PATH = '../session.json';
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+const { handleRateLimitAndMessageLength } = require('./services/rateLimit');
+const { processMessageInChain } = require('./services/messaging');
+const { isUserInBlacklist, isUserBlocked } = require('./services/state');
 
-let sessionData = require(path.resolve(__dirname, SESSION_FILE_PATH));
-
-const client = new Client({ session: sessionData });
-
-client.on('ready', () => {
-  console.log('Client is ready!');
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        args: ['--no-sandbox']
+    }
 });
 
-client.on('message', message => {
-  const ver = new Version(message.body)
-  if (ver.getVersion()) {
-    message.reply(ver.getVersion());
-  }
+client.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true });
+});
 
+client.on('authenticated', () => {
+    console.log('Sessão autenticada!');
+});
+
+client.on('ready', () => {
+    console.log('Cliente está pronto!');
+});
+
+client.on('message', async msg => {
+    let blocked;
+    const userPhoneNumber = msg.from;
+    const message = msg.body;
+    const type = msg.type;
+
+    const result = handleRateLimitAndMessageLength(userPhoneNumber, message, type);
+
+    if (result === true) {
+        return;
+    } else if (typeof result === "string") {
+        client.sendMessage(userPhoneNumber, result);
+    } else if (result === false) {
+        const response = await processMessageInChain(userPhoneNumber, message);
+
+        if (isUserInBlacklist(userPhoneNumber) || isUserBlocked(userPhoneNumber)) {
+            console.log(`Usuário ${userPhoneNumber} está bloqueado ou na blacklist.`);
+            return;
+        }
+
+        if (response) {
+            client.sendMessage(userPhoneNumber, response);
+        }
+    }
 });
 
 client.initialize();

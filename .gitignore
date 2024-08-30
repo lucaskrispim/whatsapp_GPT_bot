@@ -1,2 +1,5 @@
 node_modules/
 session.json
+.wwebjs_auth/
+.wwebjs_cache/
+.*/
