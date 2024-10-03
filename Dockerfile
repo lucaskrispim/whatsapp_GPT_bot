@@ -36,4 +36,4 @@ COPY .wwebjs_cache ./.wwebjs_cache
 EXPOSE 3000
 
 # Define o comando para rodar a aplicação
-CMD ["node", "src/test.js"]
+CMD ["node", "src/index.js"]
