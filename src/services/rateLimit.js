@@ -30,7 +30,6 @@ function handleRateLimitAndMessageLength(userPhoneNumber, msg, msgType) {
 
     if (msgType !== 'chat') {
         userRateLimit.unsupportedViolations += 1;
-
         if (userRateLimit.unsupportedViolations >= MAX_UNSUPPORTED_VIOLATIONS) {
             addUserToBlacklist(userPhoneNumber);
             console.log(`Usuário ${userPhoneNumber} foi adicionado à blacklist por enviar mensagens não suportadas.`);

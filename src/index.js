@@ -3,7 +3,7 @@ const qrcode = require('qrcode-terminal');
 const { handleRateLimitAndMessageLength } = require('./services/rateLimit');
 const { processMessageInChain } = require('./services/messaging');
 const { isUserInBlacklist, isUserBlocked } = require('./services/state');
-const { handleBotControl, getActiveFlag } = require('./services/control')
+const { handleBotControl } = require('./services/control')
 const axios = require('axios');
 const express = require('express');
 const app = express();
@@ -28,18 +28,9 @@ client.on('ready', () => {
 });
 
 client.on('message', async msg => {
-    let blocked;
     const userPhoneNumber = msg.from;
     const message = msg.body;
     const type = msg.type;
-
-    const isControlCommand = handleBotControl(message, userPhoneNumber);
-    if (isControlCommand) return;
-
-    if (!getActiveFlag()) {
-        console.log("Bot está desligado. Mensagem ignorada.");
-        return;
-    }
 
     const result = handleRateLimitAndMessageLength(userPhoneNumber, message, type);
 
@@ -49,6 +40,18 @@ client.on('message', async msg => {
         console.log(`0 ${result}`)
         client.sendMessage(userPhoneNumber, result);
     } else if (result === false) {
+
+        const control = handleBotControl(message);
+        if (control.flag){
+            client.sendMessage(userPhoneNumber, control.msg); 
+            return;
+        }
+    
+        if (!control.status){
+            console.log("Mensagem ignorada. O bot está inativo!");
+            return;
+        }
+
         const response = await processMessageInChain(userPhoneNumber, message);
 
         if (isUserInBlacklist(userPhoneNumber) || isUserBlocked(userPhoneNumber)) {

@@ -1,28 +1,38 @@
-
 let isActive = false;
 
-function handleBotControl(message, userPhoneNumber) {
+function handleBotControl(message) {
     switch (message) {
         case '!start':
+
+            if(isActive){
+                return {flag:true, msg:"Bot já está ativo!", status:isActive};
+            }
+
             isActive = true;
-            client.sendMessage(userPhoneNumber, "Bot foi iniciado e está ativo!");
             console.log("Bot foi iniciado via comando !start.");
-            return true;
+            return {flag:true, msg:"Bot foi iniciado e está ativo!", status:isActive};
         case '!stop':
+
+            if(!isActive){
+                return {flag:true, msg:"Bot já está inativo!", status:isActive};
+            }
+
             isActive = false;
-            client.sendMessage(userPhoneNumber, "Bot foi parado e está inativo!");
             console.log("Bot foi parado via comando !stop.");
-            return true;
+            return {flag:true, msg:"Bot foi parado e está inativo!", status:isActive};
+        case '!status':
+            console.log("O status do bot está send pedido via comando !status.");
+
+            if (isActive){
+                return {flag:true, msg:"Bot está ativo!", status:isActive}; 
+            }
+
+            return {flag:true, msg:"Bot está inativo!", status:isActive}; 
         default:
-            return false;
+            return {flag:false, msg:" ", status:isActive};
     }
 }
 
-function getActiveFlag(){
-    return isActive;
-}
-
 module.exports = {
-    handleBotControl,
-    getActiveFlag
+    handleBotControl
 };
