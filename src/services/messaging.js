@@ -49,11 +49,8 @@ async function processMessageInChain(userPhoneNumber, msg) {
 }
 
 async function handleMessage(userPhoneNumber, msg) {
-    await randomPause();
 
     const resposta = await sendMessageWithToken(msg, userPhoneNumber);
-
-    await randomPause();
 
     return resposta;
 }

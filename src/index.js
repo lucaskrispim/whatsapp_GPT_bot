@@ -81,7 +81,7 @@ function keepAlive() {
         axios.get(`${BASE_URL}/ping`)
             .then(() => console.log("Ping enviado para manter o contêiner ativo."))
             .catch((err) => console.error("Erro ao enviar ping:"));
-    }, 5 * 60 * 1000);
+    }, 1 * 60 * 1000);
 }
 
 app.listen(3000, () => {
