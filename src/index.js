@@ -31,7 +31,6 @@ client.on('message', async msg => {
     const userPhoneNumber = msg.from;
     const message = msg.body;
     const type = msg.type;
-
     const result = handleRateLimitAndMessageLength(userPhoneNumber, message, type);
 
     if (result === true) {
@@ -69,8 +68,9 @@ client.on('message', async msg => {
 client.initialize();
 
 app.get('/ping', (req, res) => {
-    res.status(200).json({ "Ping": "Pong" });
     console.log("Recebido ping de keep-alive.");
+    res.status(200).json({ "Ping": "Pong" });
+    
 });
 
 function keepAlive() {
@@ -86,5 +86,4 @@ function keepAlive() {
 
 app.listen(3000, () => {
     console.log('Servidor HTTP escutando na porta 3000');
-    keepAlive();
 });
