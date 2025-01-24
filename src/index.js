@@ -1,9 +1,9 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const { handleRateLimitAndMessageLength } = require('./services/rateLimit');
-const { processMessageInChain } = require('./services/messaging');
-const { isUserInBlacklist, isUserBlocked } = require('./services/state');
-const { handleBotControl } = require('./services/control')
+// const { handleRateLimitAndMessageLength } = require('./services/rateLimit');
+const { handleClientMessage } = require('./services/messaging');
+// const { isUserInBlacklist, isUserBlocked } = require('./services/state');
+// const { handleBotControl } = require('./services/control')
 const axios = require('axios');
 const express = require('express');
 const app = express();
@@ -28,41 +28,7 @@ client.on('ready', () => {
 });
 
 client.on('message', async msg => {
-    const userPhoneNumber = msg.from;
-    const message = msg.body;
-    const type = msg.type;
-    const result = handleRateLimitAndMessageLength(userPhoneNumber, message, type);
-
-    if (result === true) {
-        return;
-    } else if (typeof result === "string") {
-        console.log(`0 ${result}`)
-        client.sendMessage(userPhoneNumber, result);
-    } else if (result === false) {
-
-        const control = handleBotControl(message);
-        if (control.flag){
-            client.sendMessage(userPhoneNumber, control.msg); 
-            return;
-        }
-    
-        if (!control.status){
-            console.log("Mensagem ignorada. O bot está inativo!");
-            return;
-        }
-
-        const response = await processMessageInChain(userPhoneNumber, message);
-
-        if (isUserInBlacklist(userPhoneNumber) || isUserBlocked(userPhoneNumber)) {
-            console.log(`Usuário ${userPhoneNumber} está bloqueado ou na blacklist.`);
-            return;
-        }
-
-        if (response) {
-            console.log(`1 ${result}`)
-            client.sendMessage(userPhoneNumber, response);
-        }
-    }
+    await handleClientMessage(msg, client);
 });
 
 client.initialize();

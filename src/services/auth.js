@@ -9,7 +9,7 @@ async function loginAndGetToken(userPhoneNumber) {
             user_id: userPhoneNumber,
             password: COMMON_PASSWORD
         });
-
+        console.log('Token ',loginResponse.data.token)
         return loginResponse.data.token;
     } catch (error) {
         console.error('Erro ao fazer login:', error);
